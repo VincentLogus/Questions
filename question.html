@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Quiz</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to bottom right, #5a4b3f, #3e3028);
+      color: #f2e9e1;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #ffcf9c;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    .card {
+      background: #3c2f2f;
+      padding: 2rem;
+      margin: 2rem auto;
+      border-radius: 1.5rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      max-width: 600px;
+    }
+    .choice-btn {
+      display: block;
+      margin: 0.6rem auto;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 0.8rem;
+      background: #a86c3d;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    .choice-btn:hover {
+      background: #c07b40;
+    }
+    .lang-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.4rem 0.8rem;
+      background: #ffb347;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #fff;
+    }
+    .lang-toggle:hover {
+      background: #ffa133;
+    }
+    .result-img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .fade-in {
+      opacity: 1;
+      transition: opacity 0.5s;
+    }
+    .back-btn {
+      margin-top: 1rem;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 0.8rem;
+      background: #4b9ed6;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    .back-btn:hover {
+      background: #338fca;
+    }
+    a {
+      color: #ffcc80;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<h1>Who is your Kanya Founder Spirit</h1>
+  <button class="lang-toggle" onclick="toggleLang()">to EN</button>
+  <div id="quiz" class="card"></div>
+  <div id="result" class="card" style="display: none;"></div>
+
+  <script>
+    const langData = {
+      th: {
+        questions: [
+          {
+            text: "คนไข้มาด้วยอาการปวดขา เดินไม่คล่องตัว",
+            choices: ["ลองนึกดูดีๆนะว่าเราไปทำอะไรมา", "เป็นเยอะเลยหรอคะ", "เข้ามาได้เลยค่ะ", "ผมว่าเราต้องดูปัจจัยโดยรอบด้วย", "พี่ว่ามันมาจากหลัง"],
+            values: [[2, 3], [2], [6], [4,5], [1]]
+          },
+          {
+            text: "ไปนวดดีไหมคะ",
+            choices: ["จะดีหรอ", "เชื่อพี่นะ มาที่กันยาเถอะ", "แล้วทำไมเราถึงอยากไปล่ะ", "เป็นพี่ พี่ไม่ไป", "แล้วเคยได้ไปลองไหมครับ"],
+            values: [[2,4,5], [2,6], [1], [1,2], [3,4,5]]
+          },
+          {
+            text: "ตื่นมาแล้วยังปวดอยู่เลย",
+            choices: ["เดี๋ยวหาคิวให้นะ", "ได้สังเกตุอาการณ์ตัวเองบ้างไหมว่าเกิดอะไรขึ้น", "วันก่อนหน้าได้มีไปทำอะไรมาไหมคะ", "ก็มันยังอักเสบอยู่ เป็นธรรมดา", "ไหนมาดูหน่อยซิ"],
+            values: [[6], [1,4], [2,6], [4,5], [1]]
+          },
+          {
+            text: "ออกกำลังกายแล้วเหนื่อยมากเลย",
+            choices: ["มันต้องทำ ไม่ทำมันไม่หาย", "ยังมีอาการอื่นร่วมด้วยไหม", "อ๋อ ค่ะ.. แต่มันต้องหมั่นทำนะคะ", "ทำแต่พอดี", "แต่ตอนขณะทำแล้วดีขึ้นใช่ไหม"],
+            values: [[1], [3], [2,6], [4], [3]]
+          },
+          {
+            text: "เนี่ย ไปอ่านที่เค้าแชร์กันว่าทำแบบนี้แล้วดี..",
+            choices: ["ผมว่ามันมีข้อจำกัดของมันนะ", "แล้วเราเคยลองทำดูหรือยัง", "แต่ มันอาจจะไม่ได้ดีกับทุกคนนะคะ", "แบบนี้อาจจะดีกว่านะ", "บางทีมันก็ไม่ได้ตรงไปเสียทุกเรื่อง เราต้องมาวิเคราะห์ให้รู้ถึงปัญหา"],
+            values: [[5], [2,4], [2,6], [3], [1]]
+          },
+          {
+            text: "วิธีสอนคนไข้ออกกำลังกาย",
+            choices: ["ทำแบบนี้แล้วดีนะ", "อีกนิดนะคะ", "....", "พยายามตรงนี้อีกนิดนะ", "มา อีกรอบ"],
+            values: [[3], [2,6], [3,5], [4], [1,5]]
+          }
+        ],
+        results: {
+          1: { text: "อ.กันยา คุณเป็นคนใส่ใจรายละเอียด และมีเป้าหมายข้างหน้าชัดเจน มุ่งทำทุกอย่าง อย่างพากเพียร", image: "https://drive.google.com/thumbnail?id=1KsWiQRpiaA1Zm_sVdqswsPSQYo1NPlEv" },
+          2: { text: "อ.โสภา คุณเป็นคนอ่อนไหวและขี้เกรงใจ ถนัดใช้วิธีประณีประนอมเพื่อผลลัพท์ที่ดีที่สุด", image: "https://drive.google.com/thumbnail?id=1Tc3x8uL58wp3mkVqj4WgOQn7TQQI1hZY" },
+          3: { text: "อ.คมปกรณ์ คุณเป็นคนรักสงบและเห็นเเก่นแท้ของชีวิต สิ่งสำคัญที่สุดคือการลงมือทำ ฝึกปรือจนชำนาญ", image: "https://drive.google.com/thumbnail?id=1Lw7fKMXX2V2jQXtrd4Xfjk5qVz_Q6Ihp" },
+          4: { text: "อ.คีรินท์ คุณเป็นคนกล้าและชอบความท้าทาย คุณมีบุคลิกสำคัญที่สามารถชักจูงคนรอบข้างได้โดยง่าย", image: "https://drive.google.com/thumbnail?id=1UUywgXrtdHsMV3WH57FRvs-oz_0k2vJh" },
+          5: { text: "อ.วรรธนะ คุณเป็นคนง่ายๆ แต่แฝงด้วยพื้นฐานของความรู้ ต้องมีที่มาชัดเจนและทำซ้ำจนเป็นที่น่าเชื่อถือพอ", image: "https://drive.google.com/thumbnail?id=1cZMRI4xTtm5AMB8mTyC7EFtmhWLUD4nF" },
+          6: { text: "อ.จิตวรี คุณเป็นคนมีระเบียบและจัดสรรค์เวลาได้อย่างเฉียบแหลม", image: "https://drive.google.com/thumbnail?id=1mib8CBSTnE3wJYH77Ud9F2GoM6Vhr0tY" },
+        },
+        share: "🔁แชร์ผลลัพธ์",
+        back: "↩️เริ่มใหม่"
+      },
+      en: {
+        questions: [
+          {
+            text: "patient comes with leg pain , unable to walk properly",
+            choices: ["please think of what have you been doing", "does it hurt?", "Come see me quick", "We have to look at all possibilities", "I think,it came from the back"],
+            values: [[2, 3], [2], [6], [4,5], [1]]
+          },
+          {
+            text: "been visiting the massager,does it help ?",
+            choices: ["Is it?", "trust me come to kanya", "Why do you wish to go", "If I were in you shoes , I won't go", "Have you tried it?"],
+            values: [[2,4,5], [2,6], [1], [1,2], [3,4,5]]
+          },
+          {
+            text: "it still painful after waking up",
+            choices: ["let me book you a schedule", "Have you recite the previous day activity?", "What did you do yesterday", "It's normal , it's inflamation process", "Let me see"],
+            values: [[6], [1,4], [2,6], [5], [1]]
+          },
+          {
+            text: "The exercise is too much!",
+            choices: ["It must be done, it will be better", "Do you have other symptoms?", "yes.. indeed. now try a little more", "Just do to the point that you can", "But you are getting better when doing it correct?"],
+            values: [[1], [3], [2,6], [4], [3]]
+          },
+          {
+            text: "I've read this story..they says doing like this... is good for you",
+            choices: ["I believe it has it's own limitation", "Hvae you done it before ?", "yes but in your case it might not be-fitting", "may I suggest ,This may be better", "You can't blindly trust them , you need to find the cause"],
+            values: [[5], [2,4], [2,6], [3], [1]]
+          },
+          {
+            text: "Teaching patient to exercise",
+            choices: ["This will make you recover well", "Just a little more", "....", "Try this slowly", "come , here we go , another round"],
+            values: [[3], [2,6], [3,5], [4], [1,5]]
+          }
+        ],
+        results: {
+          1: { text: "Prof.Kanya", image: "https://drive.google.com/thumbnail?id=1KsWiQRpiaA1Zm_sVdqswsPSQYo1NPlEv" },
+          2: { text: "Prof.Sopa", image: "https://drive.google.com/thumbnail?id=1Tc3x8uL58wp3mkVqj4WgOQn7TQQI1hZY" },
+          3: { text: "Prof.Khompakorn", image: "https://drive.google.com/thumbnail?id=1Lw7fKMXX2V2jQXtrd4Xfjk5qVz_Q6Ihp" },
+          4: { text: "Prof.Keerin", image: "https://drive.google.com/thumbnail?id=1UUywgXrtdHsMV3WH57FRvs-oz_0k2vJh" },
+          5: { text: "Prof.Wattana", image: "https://drive.google.com/thumbnail?id=1cZMRI4xTtm5AMB8mTyC7EFtmhWLUD4nF" },
+          6: { text: "Prof.Jitvaree", image: "https://drive.google.com/thumbnail?id=1mib8CBSTnE3wJYH77Ud9F2GoM6Vhr0tY" },
+        },
+        share: "🔁Share result",
+        back: "↩️Start Over"
+      }
+    };
+
+    let lang = 'th';
+    let currentQ = 0;
+    let answers = [];
+
+    function toggleLang() {
+      lang = (lang === 'th') ? 'en' : 'th';
+      document.querySelector('.lang-toggle').innerText = lang === 'th' ? 'to EN' : 'TH';
+      startQuiz();
+    }
+
+    function startQuiz() {
+      currentQ = 0;
+      answers = [];
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      document.getElementById('quiz').classList.remove('fade-out');
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = langData[lang].questions[currentQ];
+      let html = `<h2>${q.text}</h2>`;
+      q.choices.forEach((choice, i) => {
+        html += `<button class="choice-btn" onclick="selectAnswer(${i})">${choice}</button>`;
+      });
+      document.getElementById('quiz').innerHTML = html;
+    }
+
+    function selectAnswer(index) {
+      const values = langData[lang].questions[currentQ].values[index];
+      answers.push(...values);
+      currentQ++;
+      if (currentQ < langData[lang].questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('quiz').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('quiz').style.display = 'none';
+        const tally = {};
+        answers.forEach(val => tally[val] = (tally[val] || 0) + 1);
+        const max = Math.max(...Object.values(tally));
+        const maxKeys = Object.keys(tally).filter(k => tally[k] === max);
+        const final = maxKeys[Math.floor(Math.random() * maxKeys.length)];
+        const result = langData[lang].results[final];
+        const shareTxt = langData[lang].share;
+        const backTxt = langData[lang].back;
+
+        document.getElementById('result').innerHTML = `
+          <img class="result-img" src="${result.image}" alt="result">
+          <p>${result.text}</p>
+          <p>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://yourgithubpage.com" target="_blank">🔵 Facebook</a> |
+            <a href="https://line.me/R/msg/text/?${encodeURIComponent(result.text)}" target="_blank">🟢 Line</a>
+          </p>
+          <button class="back-btn" onclick="startQuiz()">${backTxt}</button>
+        `;
+        document.getElementById('result').style.display = 'block';
+      }, 500);
+    }
+
+    // Start quiz
+    startQuiz();
+  </script>
+</body>
+</html>
